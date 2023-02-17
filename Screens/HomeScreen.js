@@ -3,6 +3,7 @@ import { ScaledSheet } from 'react-native-size-matters';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import {LineChart} from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import { useEffect, useState} from 'react';
 import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView } from 'react-native';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
@@ -61,15 +62,17 @@ export default function HomeScreen(props) {
           <Text style = {styles.LocationText}>
            {actuallLocation}
           </Text>
-
+      <View style = {styles.TfAmIdoin}>
           </View>
           {/*Temperature*/}
           <View style = {styles.Temperature}>
                 <Text style = {styles.temperatureText}>{temperature}</Text>
 
           </View>
-
-  {/*LineChart*/}        
+          </View>
+  {/*
+          fetch('https://api.open-meteo.com/v1/forecast?latitude=50.09&longitude=14.42&hourly=temperature_2m,rain,showers,snowfall,cloudcover,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto');
+  */}{/*LineChart*/}        
           <View style = {styles.LineChart}>
           
   <LineChart
@@ -131,7 +134,8 @@ export default function HomeScreen(props) {
       borderWidth: '5@s',
       borderRadius : 360,
       width : 200,
-      height : 200
+      height : 200,
+      marginBottom : '10@s'
     },
     temperatureText :{
       fontWeight : "bold",
@@ -141,5 +145,8 @@ export default function HomeScreen(props) {
     LineChart : {
       alignItems : "center",
       justifyContent : "center"
+    },
+    TfAmIdoin : {
+      alignContent : "center"
     }
   });

@@ -3,6 +3,7 @@ import SecondScreen from "./Screens/SecondScreen";
 import Login from "./Screens/Login";
 import Register from "./Screens/Register";
 import Password from "./Screens/Password";
+import TestFile from "./TestFile";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {Appearance} from 'react-native';
@@ -28,6 +29,13 @@ export default function App() {
       component={Login}
       
       />
+      <Stack.Screen
+        name="TestFile"
+        component={TestFile}
+        options={{title : "Test File",
+        headerShown: false
+      }}
+        />
         <Stack.Screen
         name="HomeScreen"
         component={HomeScreen}

@@ -54,6 +54,11 @@ export default function Register(props) {
                 Register
             </Text>
           </Pressable>
+          <Pressable style = {styles.button} onPress={() => navigation.navigate("TestFile")}>
+            <Text style = {styles.ButtonText}>
+                TestFile
+            </Text>
+          </Pressable>
           </ImageBackground>
         </View>
       );
