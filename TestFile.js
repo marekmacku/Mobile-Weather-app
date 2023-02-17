@@ -33,7 +33,7 @@ export default function App(props) {
     }
     
     console.log(response);
-    return <Text>Temperature (C): {response["temperature_2m"].rate}</Text>;
+    return <Text>Temperature ({response.hourly_units.temperature_2m}): {response.hourly.temperature_2m[167]}</Text>;
   };
 
   return (
