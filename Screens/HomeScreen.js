@@ -21,22 +21,14 @@ const chartConfig = {
   backgroundGradientFromOpacity: 0.5,
   backgroundGradientTo: "#051923",
   backgroundGradientToOpacity: 10,
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-  strokeWidth: 2, // optional, default 3
-  barPercentage: 10,
-  useShadowColorFromDataset: false // optional
-};
-
-const data = {
-  labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday","Sunday"],
-  datasets: [
-    {
-      data: [20, 45, 28, 80, 99, 43],
-      color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-      strokeWidth: 5 // optional
-    }
-  ],
-  legend: ["Week"] // optional
+  color: (opacity = 1, temperature) => `rgba(26, 255, 146, ${opacity})`,
+  strokeWidth: 2,
+  barPercentage: 0.8,
+  useShadowColorFromDataset: false,
+  decimalPlaces: 0,
+  propsForLabels: {
+    fontSize: 12,
+  },
 };
 
 const screenWidth = Dimensions.get("window").width;
@@ -48,17 +40,20 @@ const HomeScreen = (props) => {
   const [cityName, setCityName] = useState(null);
   const [tempData, setTempData] = useState([]);
 
-const getWeatherData = async (latitude, longitude) => {
-    let actualWeatherURL = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
+  const getWeatherData = async (latitude, longitude) => {
+    let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
     try {
       const response = await fetch(actualWeatherURL);
       const data = await response.json();
-      const currentTemp = data.main.temp;
-      setTemperature(currentTemp);
+      const currentTemp = data.list.map((temp) => Math.round(temp.main.temp));
+      setTempData(currentTemp);
       console.log(currentTemp); // log current temperature to console
-      const cityName = data.name;
+      const cityName = data.city.name;
       setCityName(cityName);
       console.log(cityName); // log city name to console
+      if (currentTemp.length > 0) {
+        setTemperature(Math.round(currentTemp[0]));
+      }
     } catch (error) {
       console.error(error);
     }
@@ -80,26 +75,6 @@ const getWeatherData = async (latitude, longitude) => {
       }
     })();
   }, []);
-
-  const data = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [
-      {
-        data: [20, 21, 22, 23, 22, 21, 20],
-        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        strokeWidth: 2
-      }
-    ]
-  };
-
-  const chartConfig = {
-    backgroundGradientFrom: '#1E2923',
-    backgroundGradientTo: '#08130D',
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    strokeWidth: 2,
-    barPercentage: 0.5
-  };
 
   return (
     <View style={styles.BcgImageContainer}>
@@ -131,17 +106,34 @@ const getWeatherData = async (latitude, longitude) => {
             </View>
 
             <View style={styles.LineChart}>
-              <LineChart
-                data={data}
-                width={screenWidth - 10}
-                height={300}
-                verticalLabelRotation={30}
-                chartConfig={chartConfig}
-                style={{
-                  borderRadius: 20
-                }}
-                bezier
-              />
+              {tempData.length > 0 && (
+        <>
+          <Text style={styles.title}>Weather for next 24 h</Text>
+          <LineChart
+            data={{
+              labels: [
+                '12am',
+                '3am',
+                '6am',
+                '9am',
+                '12pm',
+                '3pm',
+                '6pm',
+                '9pm',
+              ],
+              datasets: [
+                {
+                  data: tempData,
+                  strokeWidth: 2,
+                },
+              ],
+            }}
+            width={screenWidth - 40}
+            height={220}
+            chartConfig={chartConfig}
+          />
+        </>
+      )}
             </View>
           </ScrollView>
         </SafeAreaView>
