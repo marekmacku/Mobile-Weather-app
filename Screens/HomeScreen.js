@@ -60,6 +60,7 @@ const HomeScreen = (props) => {
       const cityName = data.city.name;
       setCityName(cityName);
       console.log(cityName); // log city name to console
+      setTemperature(Math.round(data.list[0].main.temp));
     } catch (error) {
       console.error(error);
     }
@@ -132,6 +133,8 @@ const HomeScreen = (props) => {
       />
         </>
       )}
+
+
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -172,7 +175,7 @@ export default HomeScreen;
     },
     LocationText : {
       fontWeight : "bold",
-      fontSize : '25',
+      fontSize : 25,
       color : '#FFF'
     },
     Temperature : {
