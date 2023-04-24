@@ -54,9 +54,9 @@ export default function Register(props) {
                 Register
             </Text>
           </Pressable>
-          <Pressable style = {styles.button} onPress={() => navigation.navigate("TestFile")}>
+          <Pressable style = {styles.button} onPress={() => navigation.navigate("HomeScreen")}>
             <Text style = {styles.ButtonText}>
-                TestFile
+                Test ApiCall
             </Text>
           </Pressable>
           </ImageBackground>

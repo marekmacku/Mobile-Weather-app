@@ -4,13 +4,18 @@ import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import {LineChart} from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { useEffect, useState} from 'react';
-import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView } from 'react-native';
+import * as Location from 'expo-location';
+import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView,ActivityIndicator } from 'react-native';
+//import { Weather } from './ApiCalling';
+//import {Weather} from './TestScreen';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const logo_png = "../Images/Logo_ActuallyPng.png";
 const clouds = "../Images/cloud.jpeg";
 const actuallLocation = "Praha";
-const temperature = "12";
+const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
+
+
 
 const chartConfig = {
   backgroundGradientFrom: "#051923",
@@ -37,62 +42,115 @@ const data = {
 
 const screenWidth = Dimensions.get("window").width;
 
-export default function HomeScreen(props) {
-    const {navigation,onPress, title = 'save'} = props;
-    return (
+const HomeScreen = (props) => {
+  const { navigation, onPress, title = 'save' } = props;
+  const [temperature, setTemperature] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [cityName, setCityName] = useState(null);
 
-      <View style = {styles.BcgImageContainer}>
-        <ImageBackground style = {styles.bcgImage} source={require(clouds)}>
-      
-      <SafeAreaView style = {styles.Container}>
+const getWeatherData = async (latitude, longitude) => {
+    let actualWeatherURL = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
+    try {
+      const response = await fetch(actualWeatherURL);
+      const data = await response.json();
+      const currentTemp = data.main.temp;
+      setTemperature(currentTemp);
+      console.log(currentTemp); // log current temperature to console
+      const cityName = data.name;
+      setCityName(cityName);
+      console.log(cityName); // log city name to console
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-      <ScrollView> 
-      
-         {/*Header*/}
-         <View style = {styles.Header}>
+  useEffect(() => {
+    (async () => {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission to access location was denied');
+          return;
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+        getWeatherData(location.coords.latitude, location.coords.longitude);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
 
-          <Text style = {styles.HeaderText}>
-            Weather
-            </Text>
-          </View>
-          
-          {/*Location*/}
-          <View style = {styles.Location}>
+  const data = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    datasets: [
+      {
+        data: [20, 21, 22, 23, 22, 21, 20],
+        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+        strokeWidth: 2
+      }
+    ]
+  };
 
-          <Text style = {styles.LocationText}>
-           {actuallLocation}
-          </Text>
-      <View style = {styles.TfAmIdoin}>
-          </View>
-          {/*Temperature*/}
-          <View style = {styles.Temperature}>
-                <Text style = {styles.temperatureText}>{temperature}</Text>
+  const chartConfig = {
+    backgroundGradientFrom: '#1E2923',
+    backgroundGradientTo: '#08130D',
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5
+  };
 
-          </View>
-          </View>
-  {/*
-          fetch('https://api.open-meteo.com/v1/forecast?latitude=50.09&longitude=14.42&hourly=temperature_2m,rain,showers,snowfall,cloudcover,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto');
-  */}{/*LineChart*/}        
-          <View style = {styles.LineChart}>
-          
-  <LineChart
-  data={data}
-  width={screenWidth -10}
-  height={300}
-  verticalLabelRotation={30}
-  chartConfig={chartConfig}
-  style={{
-    borderRadius: 20
-  }}
-  bezier
-/>
-          </View>
-      </ScrollView>
-      </SafeAreaView>
+  return (
+    <View style={styles.BcgImageContainer}>
+      <ImageBackground style={styles.bcgImage} source={require(clouds)}>
+        <SafeAreaView style={styles.Container}>
+          <ScrollView>
+            
+
+            {/*Header*/}
+            <View style={styles.Header}>
+              <Text style={styles.HeaderText}>Weather</Text>
+            </View>
+
+            {/*Location*/}
+            <View style={styles.Location}>
+              <Text style={styles.LocationText}> {cityName}</Text>
+              <View style={styles.TfAmIdoin}></View>
+
+              {/*Temperature*/}
+              <View style={styles.Temperature}>
+              {temperature !== null ? (
+        <Text style= {styles.temperatureText}>
+          {Math.round(temperature)}
+        </Text>
+      ) : (
+        <ActivityIndicator size="large"color="#0000ff" />
+      )}
+              </View>
+            </View>
+
+            <View style={styles.LineChart}>
+              <LineChart
+                data={data}
+                width={screenWidth - 10}
+                height={300}
+                verticalLabelRotation={30}
+                chartConfig={chartConfig}
+                style={{
+                  borderRadius: 20
+                }}
+                bezier
+              />
+            </View>
+          </ScrollView>
+        </SafeAreaView>
       </ImageBackground>
-      </View>
-    );
-  }
+    </View>
+  );
+};
+
+export default HomeScreen;
   
   const styles = ScaledSheet.create({
     BcgImageContainer: {
