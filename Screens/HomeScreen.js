@@ -12,7 +12,6 @@ import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, Touchable
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const logo_png = "../Images/Logo_ActuallyPng.png";
 const clouds = "../Images/cloud.jpeg";
-const actuallLocation = "Praha";
 const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
 
 
@@ -47,6 +46,7 @@ const HomeScreen = (props) => {
   const [temperature, setTemperature] = useState(null);
   const [location, setLocation] = useState(null);
   const [cityName, setCityName] = useState(null);
+  const [tempData, setTempData] = useState([]);
 
 const getWeatherData = async (latitude, longitude) => {
     let actualWeatherURL = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
