@@ -5,6 +5,7 @@ import {LineChart} from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { useEffect, useState} from 'react';
 import * as Location from 'expo-location';
+
 import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView,ActivityIndicator } from 'react-native';
 //import { Weather } from './ApiCalling';
 //import {Weather} from './TestScreen';
@@ -39,21 +40,26 @@ const HomeScreen = (props) => {
   const [location, setLocation] = useState(null);
   const [cityName, setCityName] = useState(null);
   const [tempData, setTempData] = useState([]);
+  const [timeData, setTimeData] = useState([]);
 
   const getWeatherData = async (latitude, longitude) => {
-    let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
+     let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
     try {
       const response = await fetch(actualWeatherURL);
       const data = await response.json();
-      const currentTemp = data.list.map((temp) => Math.round(temp.main.temp));
-      setTempData(currentTemp);
+      const currentTemp = data.list.map(temp => Math.round(temp.main.temp));
+      const time = data.list.map((time) => {
+        let date = new Date(time.dt * 1000);
+        let hour = date.getHours();
+        return hour + ':00';
+      });
+      setTempData(currentTemp.slice(0, screenWidth / 40)); // Limit the number of data points
+      setTimeData(time.slice(0, screenWidth / 40)); // Limit the number of data points
       console.log(currentTemp); // log current temperature to console
+      console.log(time); // log time to console
       const cityName = data.city.name;
       setCityName(cityName);
       console.log(cityName); // log city name to console
-      if (currentTemp.length > 0) {
-        setTemperature(Math.round(currentTemp[0]));
-      }
     } catch (error) {
       console.error(error);
     }
@@ -110,28 +116,20 @@ const HomeScreen = (props) => {
         <>
           <Text style={styles.title}>Weather for next 24 h</Text>
           <LineChart
-            data={{
-              labels: [
-                '12am',
-                '3am',
-                '6am',
-                '9am',
-                '12pm',
-                '3pm',
-                '6pm',
-                '9pm',
-              ],
-              datasets: [
-                {
-                  data: tempData,
-                  strokeWidth: 2,
-                },
-              ],
-            }}
-            width={screenWidth - 40}
-            height={220}
-            chartConfig={chartConfig}
-          />
+        data={{
+          labels: timeData,
+          datasets: [{ data: tempData }]
+        }}
+        width={screenWidth}
+        height={260}
+        verticalLabelRotation={30}
+        chartConfig={chartConfig}
+        bezier
+        style={{
+          marginVertical: 8,
+          borderRadius: 16,
+        }}
+      />
         </>
       )}
             </View>
