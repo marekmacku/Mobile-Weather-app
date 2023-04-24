@@ -12,6 +12,7 @@ import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, Touchable
 //import {Weather} from './TestScreen';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
+const locationImage = "../Images/location.png";
 const logo_png = "../Images/Logo_ActuallyPng.png";
 const clouds = "../Images/cloud.jpeg";
 const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
@@ -23,7 +24,7 @@ const chartConfig = {
   backgroundGradientFromOpacity: 0.5,
   backgroundGradientTo: "#051923",
   backgroundGradientToOpacity: 10,
-  color: (opacity = 1, temperature) => `rgba(26, 255, 146, ${opacity})`,
+  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
   strokeWidth: 2,
   barPercentage: 0.8,
   useShadowColorFromDataset: false,
@@ -43,10 +44,28 @@ const HomeScreen = (props) => {
   const [tempData, setTempData] = useState([]);
   const [timeData, setTimeData] = useState([]);
   const [sliderValue, setSliderValue] = useState(24);
+  
+  const handlePress = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission to access location was denied');
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      console.log(location.coords); // log current location to console
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getWeatherData = async (latitude, longitude) => {
      let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
+     
+     
     try {
+      
+
       const response = await fetch(actualWeatherURL);
       const data = await response.json();
       const currentTemp = data.list.map(temp => Math.round(temp.main.temp));
@@ -55,10 +74,20 @@ const HomeScreen = (props) => {
         let hour = date.getHours();
         return hour + ':00';
       });
-      setTempData(currentTemp.slice(0, screenWidth / 40)); // Limit the number of data points
-      setTimeData(time.slice(0, screenWidth / 40)); // Limit the number of data points
-      console.log(currentTemp); // log current temperature to console
-      console.log(time); // log time to console
+      const timeData = [];
+      const tempData = [];
+      let currentHour = null;
+      for (let i = 0; i < time.length; i++) {
+        if (currentHour === null || time[i] !== currentHour) {
+          currentHour = time[i];
+          timeData.push(currentHour);
+          tempData.push(currentTemp[i]);
+        }
+      }
+      setTempData(tempData.slice(0, screenWidth/ 40)); // Limit the number of data points
+      setTimeData(timeData.slice(0, screenWidth /40)); // Limit the number of data points
+      console.log(tempData); // log current temperature to console
+      console.log(timeData); // log time to console
       const cityName = data.city.name;
       setCityName(cityName);
       console.log(cityName); // log city name to console
@@ -85,6 +114,8 @@ const HomeScreen = (props) => {
     })();
   }, []);
 
+  
+
   return (
     <View style={styles.BcgImageContainer}>
       <ImageBackground style={styles.bcgImage} source={require(clouds)}>
@@ -94,7 +125,11 @@ const HomeScreen = (props) => {
 
             {/*Header*/}
             <View style={styles.Header}>
-              <Text style={styles.HeaderText}>Weather</Text>
+            <Text style={styles.HeaderText}>Weather</Text>
+            <Pressable onPress={handlePress} >
+                  <Image style ={styles.LocationImage} source={require(locationImage) } />
+                </Pressable>
+              
             </View>
 
             {/*Location*/}
@@ -117,7 +152,7 @@ const HomeScreen = (props) => {
             <View style={styles.LineChart}>
               {tempData.length > 0 && (
         <>
-          <Text style={styles.title}>Weather for next 24 h</Text>
+          <Text style={styles.GraphText}>Weather for next 24 h</Text>
           <LineChart
         data={{
           labels: timeData.slice(0, sliderValue),
@@ -146,6 +181,7 @@ const HomeScreen = (props) => {
     value={sliderValue}
     onValueChange={(value) => setSliderValue(value)}
 />
+
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -159,20 +195,28 @@ export default HomeScreen;
   const styles = ScaledSheet.create({
     BcgImageContainer: {
         flex : 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     Container: {
       alignItems : "center"
     },
     Header :{
       marginTop : '15@s',
-      alignItems : "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+
      
     },
     HeaderText : {
-      
+      marginLeft : '52@s',
       fontWeight : "bold",
       fontSize : '20@s',
-      color : '#FFF'
+      color : '#FFF',
+      textAlign: 'center',
+      flex: 1,
     },
     image: {
       marginBottom : '40@s',
@@ -210,5 +254,14 @@ export default HomeScreen;
     },
     TfAmIdoin : {
       alignContent : "center"
+    },
+    GraphText :{
+      fontWeight : "bold",
+      fontSize : '15@s',
+      color : '#FFF'
+    },
+    LocationImage : {
+      width : 50,
+      height : 50
     }
   });
