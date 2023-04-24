@@ -5,6 +5,7 @@ import {LineChart} from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { useEffect, useState} from 'react';
 import * as Location from 'expo-location';
+import Slider from 'react-native-slider';
 
 import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView,ActivityIndicator } from 'react-native';
 //import { Weather } from './ApiCalling';
@@ -41,6 +42,7 @@ const HomeScreen = (props) => {
   const [cityName, setCityName] = useState(null);
   const [tempData, setTempData] = useState([]);
   const [timeData, setTimeData] = useState([]);
+  const [sliderValue, setSliderValue] = useState(24);
 
   const getWeatherData = async (latitude, longitude) => {
      let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
@@ -118,8 +120,8 @@ const HomeScreen = (props) => {
           <Text style={styles.title}>Weather for next 24 h</Text>
           <LineChart
         data={{
-          labels: timeData,
-          datasets: [{ data: tempData }]
+          labels: timeData.slice(0, sliderValue),
+          datasets: [{ data: tempData.slice(0, sliderValue) }]
         }}
         width={screenWidth}
         height={260}
@@ -134,7 +136,16 @@ const HomeScreen = (props) => {
         </>
       )}
 
-
+<Slider
+    style={{ width: '90%', alignSelf: 'center' }}
+    minimumValue={1}
+    maximumValue={24}
+    minimumTrackTintColor="#FFFFFF"
+    maximumTrackTintColor="#000000"
+    step={1}
+    value={sliderValue}
+    onValueChange={(value) => setSliderValue(value)}
+/>
             </View>
           </ScrollView>
         </SafeAreaView>
