@@ -8,14 +8,16 @@ import * as Location from 'expo-location';
 import Slider from 'react-native-slider';
 
 import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView,ActivityIndicator } from 'react-native';
-//import { Weather } from './ApiCalling';
-//import {Weather} from './TestScreen';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const locationImage = "../Images/location.png";
 const logo_png = "../Images/Logo_ActuallyPng.png";
 const clouds = "../Images/cloud.jpeg";
 const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
+const screenWidth = Dimensions.get("window").width;
+
+let cityLat = null;
+let cityLong = null;
 
 
 
@@ -34,7 +36,9 @@ const chartConfig = {
   },
 };
 
-const screenWidth = Dimensions.get("window").width;
+
+
+
 
 const HomeScreen = (props) => {
   const { navigation, onPress, title = 'save' } = props;
@@ -45,6 +49,7 @@ const HomeScreen = (props) => {
   const [timeData, setTimeData] = useState([]);
   const [sliderValue, setSliderValue] = useState(24);
   
+  
   const handlePress = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -53,19 +58,21 @@ const HomeScreen = (props) => {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      console.log(location.coords); // log current location to console
+      const cityLat = location.coords.latitude;
+      const cityLong = location.coords.longitude;
+      console.log(`Latitude: ${cityLat}, Longitude: ${cityLong}`); // log current latitude and longitude to console
+      getWeatherData(cityLat, cityLong);
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   const getWeatherData = async (latitude, longitude) => {
      let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
-     
-     
+ 
     try {
       
-
       const response = await fetch(actualWeatherURL);
       const data = await response.json();
       const currentTemp = data.list.map(temp => Math.round(temp.main.temp));
@@ -77,7 +84,7 @@ const HomeScreen = (props) => {
       const timeData = [];
       const tempData = [];
       let currentHour = null;
-      for (let i = 0; i < time.length; i++) {
+      for (let i = 0; i < 9; i++) {
         if (currentHour === null || time[i] !== currentHour) {
           currentHour = time[i];
           timeData.push(currentHour);
@@ -88,6 +95,7 @@ const HomeScreen = (props) => {
       setTimeData(timeData.slice(0, screenWidth /40)); // Limit the number of data points
       console.log(tempData); // log current temperature to console
       console.log(timeData); // log time to console
+      console.log(data);
       const cityName = data.city.name;
       setCityName(cityName);
       console.log(cityName); // log city name to console
