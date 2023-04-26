@@ -18,8 +18,6 @@ const clouds = "../Images/cloud.jpeg";
 const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
 const screenWidth = Dimensions.get("window").width;
 
-let cityLat = null;
-let cityLong = null;
 
 
 
@@ -52,7 +50,14 @@ const HomeScreen = (props) => {
   const [sliderValue, setSliderValue] = useState(24);
   const [text, setText] = useState('');
   const [isVisible, setIsVisible] = useState(false);
-  
+  const [feelsLikeTemperature, setFeelsLikeTemperature] = useState(null);
+  const [sunrise, setSunrise] = useState(null);
+  const [sunset, setSunset] = useState(null);
+  const [windSpeed, setWindSpeed] = useState(null);
+  const [cloudiness, setCloudiness] = useState(0);
+  const [rainVolume, setRainVolume] = useState(0);
+  const [snowVolume, setSnowVolume] = useState(0);
+
   
   const handlePress = async () => {
     try {
@@ -115,6 +120,26 @@ const HomeScreen = (props) => {
       setCityName(cityName);
       console.log(cityName); // log city name to console
       setTemperature(Math.round(data.list[0].main.temp));
+
+      const feelsLikeTemperature = Math.round(data.list[0].main.feels_like);
+      const sunrise = new Date(data.city.sunrise * 1000).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+      const sunset = new Date(data.city.sunset * 1000).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+      const windSpeed = data.list[0].wind.speed;
+
+      setFeelsLikeTemperature(feelsLikeTemperature);
+      setSunrise(sunrise);
+      setSunset(sunset);
+      setWindSpeed(windSpeed);
+
+      const cloudiness = data.list[0].clouds.all;
+      const rainVolume = data.list[0].rain ? data.list[0].rain['3h'] : 0;
+      const snowVolume = data.list[0].snow ? data.list[0].snow['3h'] : 0;
+
+      setCloudiness(cloudiness);
+      setRainVolume(rainVolume);
+      setSnowVolume(snowVolume);
+
+
     } catch (error) {
       console.error(error);
     }
@@ -211,14 +236,51 @@ const HomeScreen = (props) => {
               <View style={styles.Temperature}>
               {temperature !== null ? (
         <Text style= {styles.temperatureText}>
-           {'  '} {Math.round(temperature)} °
+           {''} {Math.round(temperature)}°
         </Text>
       ) : (
         <ActivityIndicator size="large"color="#0000ff" />
       )}
               </View>
             </View>
+          <View style={styles.infoDataContainer}>
+              <View style= {styles.cards}>
+              <Text style={styles.cardHeaderText} numberOfLines={1}>Wind speed</Text>
+<Text style={styles.cardText} numberOfLines={1}>{windSpeed} km/h</Text>
+              </View>
 
+              <View style= {styles.cards}>
+              <Text style = {styles.cardHeaderText}>Feels like</Text>
+              <Text style= {styles.cardText}>
+                    {feelsLikeTemperature}°</Text>
+              </View>
+
+              <View style= {styles.cards}>
+              <Text style = {styles.cardHeaderText}>Sunrise</Text>
+                <Text style = {styles.cardText}>{sunrise}</Text>
+                <Text style = {styles.cardHeaderText}>Sunset</Text>
+                <Text style = {styles.cardText}>{sunset}</Text>
+              </View>
+
+              <View style= {styles.cards}>
+              <Text style = {styles.cardHeaderText}>Cloudliness</Text>
+              <Text style= {styles.cardText}>
+                    {cloudiness}</Text>
+              </View>
+
+              <View style= {styles.cards}>
+              <Text style = {styles.cardHeaderText}>Rain</Text>
+              <Text style= {styles.cardText}>
+                    {rainVolume} mm</Text>
+              </View>
+
+              <View style= {styles.cards}>
+              <Text  style = {styles.cardHeaderText}>Snow</Text>
+              <Text  style= {styles.cardText}>
+                    {snowVolume} mm</Text>
+              </View>
+
+          </View>
             <View style={styles.LineChart}>
               {tempData.length > 0 && (
         <>
@@ -283,7 +345,7 @@ export default HomeScreen;
     HeaderText : {
       fontWeight : "bold",
       fontSize : '20@s',
-      color : '#000809',
+      color : '#FFFF',
       textAlign: 'center',
       flex: 1,
       marginLeft : '47@s'
@@ -295,8 +357,10 @@ export default HomeScreen;
       flex : 1,
     },
     Location : {
-      marginTop : '50@s',
-      alignItems : "center"
+      
+      alignItems : "center",
+      marginBottom : "50@s"
+
     },
     LocationText : {
       fontWeight : "bold",
@@ -309,6 +373,14 @@ export default HomeScreen;
       marginTop : 50,
       borderWidth: '5@s',
       borderColor : '#000809',
+      shadowColor: "#003846",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.75,
+      shadowRadius: 3.84,
+      elevation: 5,
       borderRadius : 360,
       width : 200,
       height : 200,
@@ -317,7 +389,10 @@ export default HomeScreen;
     temperatureText :{
       fontWeight : "bold",
       fontSize : 50,
-      color : '#FFF'
+      color : '#FFF',
+      textShadowColor: 'rgba(0, 76, 86, 0.15)',
+      textShadowOffset: {width: -1, height: 1},
+      textShadowRadius: 10,
     },
     LineChart : {
       alignItems : "center",
@@ -339,9 +414,10 @@ export default HomeScreen;
       flex: 1,
     },
     textInputStyle : {
-      borderBottomColor: 'black', 
+      borderBottomColor: 'white', 
       borderBottomWidth: '1@s', 
       backgroundColor: 'transparent',
+      color: '#FFF',
       marginTop : '20@s',
       width : '200@s',
       alignSelf : 'center'
@@ -350,5 +426,54 @@ export default HomeScreen;
       flex : 1,
      
     },
+    infoDataContainer : {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  marginTop: 100,
+  padding: 10,
+  paddingBottom : '40@s'
+},
+
+cards : {
+  borderWidth: 3,
+  borderColor: '#00353c',
+  shadowColor: "#004c56",
+  marginBottom: 16,
+  height : 100,
+  shadowOffset: {
+    width: 0,
+    height: 4,
+  },
+  shadowOpacity: 0.75,
+  shadowRadius: 3.84,
+  elevation: 5,
+  borderRadius: 5,
+  width: '31%',
+  paddingVertical: 10,
+  paddingHorizontal: 15,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+cardText :{
+  fontSize: 15,
+  fontWeight : 'bold',
+  color : 'white',
+  textAlign: 'center',
+  textShadowColor: 'rgba(0, 0, 0, 0.75)',
+  textShadowOffset: {width: -1, height: 1},
+  textShadowRadius: 10,
+},
+
+cardHeaderText : {
+  color : 'white',
+  fontSize : 12,
+  marginBottom: 5,
+  textAlign: 'center',
+  textShadowColor: 'rgba(0, 0, 0, 0.75)',
+  textShadowOffset: {width: -1, height: 1},
+  textShadowRadius: 10,
+}
 
   });
