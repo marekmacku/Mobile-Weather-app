@@ -6,11 +6,13 @@ import { Dimensions } from "react-native";
 import { useEffect, useState} from 'react';
 import * as Location from 'expo-location';
 import Slider from 'react-native-slider';
+import { LinearGradient } from 'expo-linear-gradient';
 
-import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView,ActivityIndicator } from 'react-native';
+import {StyleSheet,Alert,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,ScrollView,SafeAreaView,ActivityIndicator } from 'react-native';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const locationImage = "../Images/location.png";
+const searchImage2 = "../Images/searchImage2.png"
 const logo_png = "../Images/Logo_ActuallyPng.png";
 const clouds = "../Images/cloud.jpeg";
 const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
@@ -22,9 +24,9 @@ let cityLong = null;
 
 
 const chartConfig = {
-  backgroundGradientFrom: "#051923",
+  backgroundGradientFrom: "#113036",
   backgroundGradientFromOpacity: 0.5,
-  backgroundGradientTo: "#051923",
+  backgroundGradientTo: "#030B0D",
   backgroundGradientToOpacity: 10,
   color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
   strokeWidth: 2,
@@ -48,6 +50,8 @@ const HomeScreen = (props) => {
   const [tempData, setTempData] = useState([]);
   const [timeData, setTimeData] = useState([]);
   const [sliderValue, setSliderValue] = useState(24);
+  const [text, setText] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
   
   
   const handlePress = async () => {
@@ -60,13 +64,24 @@ const HomeScreen = (props) => {
       let location = await Location.getCurrentPositionAsync({});
       const cityLat = location.coords.latitude;
       const cityLong = location.coords.longitude;
-      console.log(`Latitude: ${cityLat}, Longitude: ${cityLong}`); // log current latitude and longitude to console
       getWeatherData(cityLat, cityLong);
     } catch (error) {
       console.error(error);
     }
   };
+
+  const handleTextChange = (newText) => {
+    setText(newText);
+  };
+
+  const handleSubmit = () => {
+    getWeatherByCityName(text);
+  };
   
+  const handleButtonClick = () => {
+    setIsVisible(!isVisible);
+  };
+
 
   const getWeatherData = async (latitude, longitude) => {
      let actualWeatherURL = `http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${ApiKey}`;
@@ -105,6 +120,32 @@ const HomeScreen = (props) => {
     }
   };
 
+
+  const getWeatherByCityName = async (someCity) => {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${someCity}&appid=${ApiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const location = data.coord;
+    const latitude = location.lat;
+    const longitude = location.lon;
+
+    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+
+    getWeatherData(latitude, longitude);
+  } catch (error) {
+    console.error(Alert.alert(
+      'The location doesn\'t exist',
+  'Please try again.',
+  [{ text: 'OK' }],
+  { cancelable: false }
+    )
+    );
+  }
+};
+
   useEffect(() => {
     (async () => {
       try {
@@ -126,30 +167,51 @@ const HomeScreen = (props) => {
 
   return (
     <View style={styles.BcgImageContainer}>
-      <ImageBackground style={styles.bcgImage} source={require(clouds)}>
+      <LinearGradient
+      colors={['#113036', '#071B1F', '#030B0D']}
+      start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.linearGradient}
+        >
+
+      
         <SafeAreaView style={styles.Container}>
           <ScrollView>
             
 
             {/*Header*/}
             <View style={styles.Header}>
-            <Text style={styles.HeaderText}>Weather</Text>
-            <Pressable onPress={handlePress} >
-                  <Image style ={styles.LocationImage} source={require(locationImage) } />
-                </Pressable>
-              
-            </View>
+              <Image style={styles.logoImages} source={require(logo_png)}></Image>
+            <Text style={styles.HeaderText}>{cityName}</Text>
 
+            <Pressable onPress={handleButtonClick} >
+                  <Image style ={styles.logoImages} source={require(searchImage2) } />
+                </Pressable>
+                
+            <Pressable onPress={handlePress} >
+                  <Image style ={styles.logoImages} source={require(locationImage) } />
+                </Pressable>
+                
+            </View>
+            {/*Search by city name*/}
+            <View style = {styles.searchByCity}>
+            {isVisible &&   <TextInput 
+                    
+                    style={styles.textInputStyle}
+                    onChangeText={handleTextChange}
+                    onSubmitEditing={handleSubmit}
+                    value={text}
+                  /> }
+        </View>
             {/*Location*/}
             <View style={styles.Location}>
-              <Text style={styles.LocationText}> {cityName}</Text>
               <View style={styles.TfAmIdoin}></View>
 
               {/*Temperature*/}
               <View style={styles.Temperature}>
               {temperature !== null ? (
         <Text style= {styles.temperatureText}>
-          {Math.round(temperature)}
+           {'  '} {Math.round(temperature)} °
         </Text>
       ) : (
         <ActivityIndicator size="large"color="#0000ff" />
@@ -193,7 +255,7 @@ const HomeScreen = (props) => {
             </View>
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
+        </LinearGradient>
     </View>
   );
 };
@@ -219,12 +281,12 @@ export default HomeScreen;
      
     },
     HeaderText : {
-      marginLeft : '52@s',
       fontWeight : "bold",
       fontSize : '20@s',
-      color : '#FFF',
+      color : '#000809',
       textAlign: 'center',
       flex: 1,
+      marginLeft : '47@s'
     },
     image: {
       marginBottom : '40@s',
@@ -239,17 +301,18 @@ export default HomeScreen;
     LocationText : {
       fontWeight : "bold",
       fontSize : 25,
-      color : '#FFF'
+      color : '#000809'
     },
     Temperature : {
       justifyContent : "center",
       alignItems : "center",
       marginTop : 50,
       borderWidth: '5@s',
+      borderColor : '#000809',
       borderRadius : 360,
       width : 200,
       height : 200,
-      marginBottom : '10@s'
+      marginBottom : '10@s',
     },
     temperatureText :{
       fontWeight : "bold",
@@ -268,8 +331,24 @@ export default HomeScreen;
       fontSize : '15@s',
       color : '#FFF'
     },
-    LocationImage : {
-      width : 50,
-      height : 50
-    }
+    logoImages : {
+      width : '50@s',
+      height : '50@s'
+    },
+    linearGradient: {
+      flex: 1,
+    },
+    textInputStyle : {
+      borderBottomColor: 'black', 
+      borderBottomWidth: '1@s', 
+      backgroundColor: 'transparent',
+      marginTop : '20@s',
+      width : '200@s',
+      alignSelf : 'center'
+    },
+    searchByCity : {
+      flex : 1,
+     
+    },
+
   });
