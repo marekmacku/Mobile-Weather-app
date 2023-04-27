@@ -14,8 +14,17 @@ const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const locationImage = "../Images/location.png";
 const searchImage2 = "../Images/searchImage2.png"
 const logo_png = "../Images/Logo_ActuallyPng.png";
-const clouds = "../Images/cloud.jpeg";
+const updated_logo = "../Images/UpdatedLogo.png";
+const updated_logo2 = "../Images/UpdatedLogo2.png";
+const cloudImage = "../Images/Cloud.png"; //cloudy
+const cloudyClouds = "../Images/CloudyClouds.png"; //mostly clouded
+const clearWeather = "../Images/SunnyCloud.png"; //clear 
+const rainCloud = "../Images/RainCloud.png"; //rain
+const snowCloud = "../Images/SnowCloud.png"; //snow
+const stormCloud = "../Images/StormCloud.png"; //storm
+
 const ApiKey = '7dd36db7d72999c08b57eef7b4d14013';
+
 const screenWidth = Dimensions.get("window").width;
 
 
@@ -57,7 +66,7 @@ const HomeScreen = (props) => {
   const [cloudiness, setCloudiness] = useState(0);
   const [rainVolume, setRainVolume] = useState(0);
   const [snowVolume, setSnowVolume] = useState(0);
-
+  const [weatherCondition, setWeatherCondition] = useState('');
   
   const handlePress = async () => {
     try {
@@ -139,6 +148,11 @@ const HomeScreen = (props) => {
       setRainVolume(rainVolume);
       setSnowVolume(snowVolume);
 
+      const weatherCondition = data.list[0].weather[0].main;
+      
+      setWeatherCondition(weatherCondition);
+      console.log(weatherCondition);
+
 
     } catch (error) {
       console.error(error);
@@ -168,6 +182,26 @@ const HomeScreen = (props) => {
   { cancelable: false }
     )
     );
+  }
+};
+
+
+const renderWeatherConditionImage = () => {
+  switch (weatherCondition) {
+    case 'Thunderstorm':
+      return <Image source={require('../Images/StormCloud.png')} style={styles.weatherImageLogo } />;
+    case 'Rain':
+      return <Image source={require('../Images/RainCloud.png')} style={styles.weatherImageLogo } />;
+    case 'Snow':
+      return <Image source={require('../Images/SnowCloud.png')} style={styles.weatherImageLogo } />;
+    case 'Clear':
+      return <Image source={require('../Images/SunnyCloud.png')} style={styles.weatherImageLogo } />;
+    case 'Clouds':
+      return <Image source={require('../Images/CloudyClouds.png')} style={styles.weatherImageLogo } />;
+    case 'Sunny':
+      return <Image source={require('../Images/Sun.png')} style={styles.weatherImageLogo } />;
+    default:
+      return <ActivityIndicator size="large"color="#003846" />
   }
 };
 
@@ -206,8 +240,9 @@ const HomeScreen = (props) => {
 
             {/*Header*/}
             <View style={styles.Header}>
-              <Image style={styles.logoImages} source={require(logo_png)}></Image>
+              <Image style={styles.mainLogo} source={require(updated_logo2)}></Image>
             <Text style={styles.HeaderText}>{cityName}</Text>
+
 
             <Pressable onPress={handleButtonClick} >
                   <Image style ={styles.logoImages} source={require(searchImage2) } />
@@ -230,19 +265,24 @@ const HomeScreen = (props) => {
         </View>
             {/*Location*/}
             <View style={styles.Location}>
-              <View style={styles.TfAmIdoin}></View>
 
               {/*Temperature*/}
               <View style={styles.Temperature}>
               {temperature !== null ? (
         <Text style= {styles.temperatureText}>
-           {''} {Math.round(temperature)}°
+            {Math.round(temperature)}°
         </Text>
+        
       ) : (
-        <ActivityIndicator size="large"color="#0000ff" />
+        <ActivityIndicator size="large"color="#004c56" />
       )}
+      <View style = {styles.weatherImages}>
+      {renderWeatherConditionImage()}
+        
+      </View>
               </View>
             </View>
+      
           <View style={styles.infoDataContainer}>
               <View style= {styles.cards}>
               <Text style={styles.cardHeaderText} numberOfLines={1}>Wind speed</Text>
@@ -348,7 +388,7 @@ export default HomeScreen;
       color : '#FFFF',
       textAlign: 'center',
       flex: 1,
-      marginLeft : '47@s'
+      marginLeft : '35@s'
     },
     image: {
       marginBottom : '40@s',
@@ -369,8 +409,10 @@ export default HomeScreen;
     },
     Temperature : {
       justifyContent : "center",
+      position: 'relative',
       alignItems : "center",
-      marginTop : 50,
+      marginTop : '50@s',
+      marginBottom : '90@s',
       borderWidth: '5@s',
       borderColor : '#000809',
       shadowColor: "#003846",
@@ -382,9 +424,8 @@ export default HomeScreen;
       shadowRadius: 3.84,
       elevation: 5,
       borderRadius : 360,
-      width : 200,
-      height : 200,
-      marginBottom : '10@s',
+      width : '200@s',
+      height : '200@s',
     },
     temperatureText :{
       fontWeight : "bold",
@@ -393,6 +434,10 @@ export default HomeScreen;
       textShadowColor: 'rgba(0, 76, 86, 0.15)',
       textShadowOffset: {width: -1, height: 1},
       textShadowRadius: 10,
+      position: 'absolute',
+      top: '28%',
+      left: '31%',
+      zIndex: 1,
     },
     LineChart : {
       alignItems : "center",
@@ -410,6 +455,10 @@ export default HomeScreen;
       width : '50@s',
       height : '50@s'
     },
+    mainLogo : {
+      width : '60@s',
+      height : '50@s'
+    },
     linearGradient: {
       flex: 1,
     },
@@ -423,16 +472,13 @@ export default HomeScreen;
       alignSelf : 'center'
     },
     searchByCity : {
-      flex : 1,
-     
+      flex : 1,     
     },
-    infoDataContainer : {
+infoDataContainer : {
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'space-between',
-  marginTop: 100,
   padding: 10,
-  paddingBottom : '40@s'
 },
 
 cards : {
@@ -474,6 +520,19 @@ cardHeaderText : {
   textShadowColor: 'rgba(0, 0, 0, 0.75)',
   textShadowOffset: {width: -1, height: 1},
   textShadowRadius: 10,
+},
+weatherImages : {
+  width: '100%',
+  height: '100%',
+  zIndex: 0,
+  position : 'relative',
+  top : '29%'
+
+},
+weatherImageLogo : {
+  width : '150@s',
+  height : '87@s',
+  alignSelf : 'center',
 }
 
   });
