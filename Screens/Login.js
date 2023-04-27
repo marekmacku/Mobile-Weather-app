@@ -1,6 +1,8 @@
 
 import { StatusBar } from 'expo-status-bar';
 import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native-web';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const logo_png = "../Images/Logo_ActuallyPng.png";
@@ -11,7 +13,8 @@ export default function Login(props) {
         <View style={styles.container}>
           <ImageBackground style = {styles.bcgImage} source={require(bcgImage)}>
             {/*Text inputs form*/ }
-
+<ScrollView>
+  <SafeAreaView>
         <Text style = {styles.TextForTxtInput}>
             Email
           </Text>
@@ -47,6 +50,8 @@ export default function Login(props) {
                 Login
             </Text>
           </Pressable>
+          </SafeAreaView>
+        </ScrollView>
           </ImageBackground>
         </View>
       );

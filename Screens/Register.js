@@ -1,6 +1,6 @@
 
 import { StatusBar } from 'expo-status-bar';
-import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,SafeAreaView } from 'react-native';
+import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,SafeAreaView,ScrollView } from 'react-native';
 
 const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
 const logo_png = "../Images/Logo_ActuallyPng.png";
@@ -12,6 +12,9 @@ export default function Register(props) {
         <View style={styles.container}>
           <ImageBackground style = {styles.bcgImage} source={require(bcgImage)}>
             {/*Text inputs form*/ }
+            <ScrollView>
+            <SafeAreaView>
+              
           <Text style = {styles.TextForTxtInput}>
             First Name
           </Text>
@@ -59,7 +62,11 @@ export default function Register(props) {
                 Test ApiCall
             </Text>
           </Pressable>
+          
+          </SafeAreaView>
+          </ScrollView>
           </ImageBackground>
+          
         </View>
       );
     }
