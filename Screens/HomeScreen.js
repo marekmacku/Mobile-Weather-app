@@ -200,8 +200,7 @@ const renderWeatherConditionImage = () => {
       return <Image source={require('../Images/CloudyClouds.png')} style={styles.weatherImageLogo } />;
     case 'Sunny':
       return <Image source={require('../Images/Sun.png')} style={styles.weatherImageLogo } />;
-    default:
-      return <ActivityIndicator size="large"color="#003846" />
+
   }
 };
 
@@ -274,7 +273,7 @@ const renderWeatherConditionImage = () => {
         </Text>
         
       ) : (
-        <ActivityIndicator size="large"color="#004c56" />
+        <ActivityIndicator size="large"color="#003846"  style={styles.indicator} />
       )}
       <View style = {styles.weatherImages}>
       {renderWeatherConditionImage()}
@@ -304,7 +303,7 @@ const renderWeatherConditionImage = () => {
 
               <View style= {styles.cards}>
               <Text style = {styles.cardHeaderText}>Cloudliness</Text>
-              <Text style= {styles.cardText}>
+              <Text style= {styles.cardText} numberOfLines={1}>
                     {cloudiness}</Text>
               </View>
 
@@ -429,7 +428,7 @@ export default HomeScreen;
     },
     temperatureText :{
       fontWeight : "bold",
-      fontSize : 50,
+      fontSize : '50@s',
       color : '#FFF',
       textShadowColor: 'rgba(0, 76, 86, 0.15)',
       textShadowOffset: {width: -1, height: 1},
@@ -486,7 +485,7 @@ cards : {
   borderColor: '#00353c',
   shadowColor: "#004c56",
   marginBottom: 16,
-  height : 100,
+  height : '100@s',
   shadowOffset: {
     width: 0,
     height: 4,
@@ -496,14 +495,14 @@ cards : {
   elevation: 5,
   borderRadius: 5,
   width: '31%',
-  paddingVertical: 10,
-  paddingHorizontal: 15,
+  paddingVertical: '10@s',
+  paddingHorizontal: '15@s',
   alignItems: 'center',
   justifyContent: 'center',
 },
 
 cardText :{
-  fontSize: 15,
+  fontSize: '15@s',
   fontWeight : 'bold',
   color : 'white',
   textAlign: 'center',
@@ -514,8 +513,8 @@ cardText :{
 
 cardHeaderText : {
   color : 'white',
-  fontSize : 12,
-  marginBottom: 5,
+  fontSize : '12@s',
+  marginBottom: '5@s',
   textAlign: 'center',
   textShadowColor: 'rgba(0, 0, 0, 0.75)',
   textShadowOffset: {width: -1, height: 1},
@@ -533,6 +532,10 @@ weatherImageLogo : {
   width : '150@s',
   height : '87@s',
   alignSelf : 'center',
+},
+indicator : {
+  position : 'relative',
+  top : '50%'
 }
 
   });

@@ -18,16 +18,9 @@ export default function App() {
         <Stack.Screen
         name="Register"
         component={Register}
-        options = {{title : "Register please",headerStyle: {
-          backgroundColor: '#f511b1'
-        },}}
+        options = {{headerShown: false
+        }}
         />
-      <Stack.Screen
-      name="Login"
-      component={Login}
-      
-      />
-
         <Stack.Screen
         name="HomeScreen"
         component={HomeScreen}
@@ -35,6 +28,15 @@ export default function App() {
         headerShown: false
       }}
         />
+        
+      <Stack.Screen
+      name="Login"
+      component={Login}
+      options = {{headerShown: false
+        }}
+      />
+
+        
       <Stack.Screen
       name="Password"
       component={Password}
