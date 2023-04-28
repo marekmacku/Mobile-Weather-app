@@ -2,7 +2,7 @@
 import { StatusBar } from 'expo-status-bar';
 import {StyleSheet,ImageBackground,Button,Text, View, Image,TextInput, TouchableOpacity, Pressable,SafeAreaView,ScrollView } from 'react-native';
 
-const bcgImage = "../Images/BackImagePinkBlueMash.jpeg";
+const bcgImage = "../Images/BcgUpdated.jpeg";
 const logo_png = "../Images/Logo_ActuallyPng.png";
 
 export default function Register(props) {
@@ -14,7 +14,7 @@ export default function Register(props) {
             {/*Text inputs form*/ }
             <ScrollView>
             <SafeAreaView>
-              
+              <Text style={styles.HeaderText}>Register</Text>
           <Text style = {styles.TextForTxtInput}>
             First Name
           </Text>
@@ -132,5 +132,9 @@ export default function Register(props) {
       LinkText : { 
         color : 'blue',
         fontSize : 15
+      },
+      HeaderText :{
+        fontSize : 20,
+        marginLeft : 12
       }
     });
